@@ -298,3 +298,13 @@ For questions or issues, please open an issue on GitHub or contact the authors.
 
 This work was conducted at North Carolina State University, Department of Computer Science.
 
+## Changelog
+
+See the git history for detailed changes. Major milestones:
+- Repository restructuring and organization
+- Docker image implementation for container-level optimizations
+- Kubernetes Helm charts for experiment deployments
+- Experiment automation scripts
+- Data analysis and visualization pipeline
+- Comprehensive documentation and README
+
