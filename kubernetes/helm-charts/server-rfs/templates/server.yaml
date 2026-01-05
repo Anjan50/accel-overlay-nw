@@ -1,0 +1,51 @@
+{{- $replicas := int .Values.replicas -}}
+{{- range $i := until $replicas -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: iperf-server-{{ add $i 1 }}
+  labels:
+    app: iperf-server-{{ add $i 1 }}
+    type: server
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: iperf
+                operator: In
+                values:
+                  - server
+  restartPolicy: Never
+  containers:
+    - name: iperf-server
+      securityContext:
+          privileged: true
+          runAsUser: 0
+      image: srinva/iperf-rfs:latest
+      imagePullPolicy: Always
+      args: ["--server"]
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "100m"
+        limits:
+          memory: "128Mi"
+          cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iperf-service-{{ add $i 1 }}
+  labels:
+    app: iperf-service-{{ add $i 1 }}
+spec:
+  ports:
+    - port: 5201
+      targetPort: 5201
+  selector:
+    app: iperf-server-{{ add $i 1 }}
+  type: ClusterIP
+---
+{{- end -}}

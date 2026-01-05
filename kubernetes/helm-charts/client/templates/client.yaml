@@ -1,0 +1,33 @@
+{{- $replicas := int .Values.replicas -}}
+{{- range $i := until $replicas -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: iperf-client-{{ add $i 1 }}
+  labels:
+    app: iperf-client-{{ add $i 1 }}
+    type: client
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: iperf
+                operator: In
+                values:
+                  - client
+  restartPolicy: Never
+  containers:
+    - name: iperf-client
+      image: networkstatic/iperf3
+      args: ["--client", "iperf-service-{{ add $i 1 }}.default.svc.cluster.local", "--time", "30"]
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "100m"
+        limits:
+          memory: "128Mi"
+          cpu: "200m"
+---
+{{- end -}}
